@@ -8,7 +8,7 @@ import AppError from '../errors/AppError';
 interface RequestDTO {
   name: string;
   email: string;
-  password: string;
+  password?: string;
 }
 
 class CreateUserService {
