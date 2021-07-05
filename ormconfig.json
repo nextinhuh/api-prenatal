@@ -1,7 +1,7 @@
 {
   "type": "postgres",
   "host": "localhost",
-  "port": 5432,
+  "port": 15432,
   "username": "root",
   "password": "root",
   "database": "api_prenatal",
@@ -12,6 +12,7 @@
     "./src/database/migrations/*.ts"
   ],
   "cli": {
-    "migrationsDir": "./src/database/migrations"
+    "migrationsDir": "./src/database/migrations",
+    "entitiesDir": "./src/models"
   }
 }

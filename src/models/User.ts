@@ -16,13 +16,22 @@ class User {
   name: string;
 
   @Column()
-  password: string;
-
-  @Column()
-  avatar: string;
-
-  @Column()
   email: string;
+
+  @Column()
+  password?: string;
+
+  @Column()
+  first_login: boolean;
+
+  @Column({ nullable: true })
+  gender_preference: string;
+
+  @Column({ nullable: true })
+  menstruation_date: Date;
+
+  @Column({ nullable: true })
+  avatar: string;
 
   @CreateDateColumn()
   created_at: Date;

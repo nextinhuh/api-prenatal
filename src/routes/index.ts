@@ -1,11 +1,13 @@
 import { Router } from 'express';
-import appointmentsRouter from './appointments.routes';
+import albumRouter from './album.routes';
 import usersRouter from './users.routes';
 import sessionsRouter from './sessions.routes';
+import noteRouter from './note.routes';
 
 const routes = Router();
 
-routes.use('/appointments', appointmentsRouter);
+routes.use('/album', albumRouter);
+routes.use('/note', noteRouter);
 routes.use('/users', usersRouter);
 routes.use('/sessions', sessionsRouter);
 

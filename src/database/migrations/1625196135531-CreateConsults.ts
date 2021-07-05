@@ -1,10 +1,15 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+} from 'typeorm';
 
-export default class CreateUsers1598807107838 implements MigrationInterface {
+export default class CreateConsults1625196135531 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'users',
+        name: 'consults',
         columns: [
           {
             name: 'id',
@@ -14,36 +19,28 @@ export default class CreateUsers1598807107838 implements MigrationInterface {
             default: 'uuid_generate_v4()',
           },
           {
-            name: 'name',
+            name: 'weight',
             type: 'varchar',
           },
           {
-            name: 'email',
-            type: 'varchar',
-            isUnique: true,
-          },
-          {
-            name: 'password',
+            name: 'heigh',
             type: 'varchar',
           },
           {
-            name: 'first_login',
-            type: 'boolean',
-          },
-          {
-            name: 'gender_preference',
+            name: 'heart_rate',
             type: 'varchar',
-            isNullable: true,
           },
           {
-            name: 'menstruation_date',
-            type: 'timestamp',
-            isNullable: true,
-          },
-          {
-            name: 'avatar',
+            name: 'blood_pressure',
             type: 'varchar',
-            isNullable: true,
+          },
+          {
+            name: 'abdominal_circumference',
+            type: 'varchar',
+          },
+          {
+            name: 'user_id',
+            type: 'uuid',
           },
           {
             name: 'created_at',
@@ -58,9 +55,21 @@ export default class CreateUsers1598807107838 implements MigrationInterface {
         ],
       }),
     );
+
+    await queryRunner.createForeignKey(
+      'consults',
+      new TableForeignKey({
+        name: 'UserConsults',
+        columnNames: ['user_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'users',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      }),
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('users');
+    await queryRunner.dropTable('consults');
   }
 }

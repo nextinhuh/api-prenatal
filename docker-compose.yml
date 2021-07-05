@@ -8,9 +8,9 @@ services:
         environment:
             POSTGRES_USER: root
             POSTGRES_PASSWORD: root
-            POSTGRES_DB: test_db
+            POSTGRES_DB: api_prenatal
         ports:
-            - "5432:5432"
+            - "15432:5432"
 
     pgadmin:
         container_name: pgadmin4_container
