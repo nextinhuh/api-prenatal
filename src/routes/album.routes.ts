@@ -15,11 +15,8 @@ albumRouter.use(ensureAuthenticated);
 
 // Get list of albuns
 albumRouter.get('/', async (request, response) => {
-  const appointments = await albumService.getAllAlbunsFromUserId(
-    request.user.id,
-  );
-
-  return response.json(appointments);
+  const albuns = await albumService.getAllAlbunsFromUserId(request.user.id);
+  return response.json(albuns);
 });
 
 // Delete an album

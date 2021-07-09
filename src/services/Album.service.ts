@@ -1,4 +1,4 @@
-import { getCustomRepository } from 'typeorm';
+import { getCustomRepository, getRepository } from 'typeorm';
 import path from 'path';
 import fs from 'fs';
 import Album from '../models/Album';
@@ -67,11 +67,30 @@ class AlbumService {
     }
   }
 
-  public async getAllAlbunsFromUserId(user_id: string): Promise<Album[]> {
+  public async getAllAlbunsFromUserId(
+    user_id: string,
+  ): Promise<Album[] | undefined> {
     const albumRepository = getCustomRepository(AlbumRepository);
-    const album = albumRepository.find({ where: { user_id } });
+    const photoRepository = getCustomRepository(PhotoRepository);
 
-    return album;
+    const albuns = await albumRepository.find({ where: { user_id } });
+
+    for (let i = 0; i < albuns.length; i++) {
+      const photoName = await photoRepository.findFirstPhotoNameFromAlbumID(
+        albuns[i].id,
+      );
+      if (photoName) {
+        Object.assign(albuns[i], {
+          cover_photo_url: photoName,
+        });
+      } else {
+        Object.assign(albuns[i], {
+          cover_photo_url: null,
+        });
+      }
+    }
+
+    return albuns;
   }
 
   public async addNewPhotoToAlbum({
@@ -107,7 +126,7 @@ class AlbumService {
       throw new AppError('Album not found.', 400);
     }
 
-    const photo = photoRepository.findPhotoList(albumId);
+    const photo = photoRepository.find({ where: { album_id: albumId } });
 
     return photo;
   }

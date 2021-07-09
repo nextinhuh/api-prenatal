@@ -4,10 +4,12 @@ import Photo from '../models/Photo';
 
 @EntityRepository(Photo)
 class AlbumRepository extends Repository<Photo> {
-  public async findPhotoList(albumId: string): Promise<Photo[]> {
-    const photos = this.find({ where: { album_id: albumId } });
+  public async findFirstPhotoNameFromAlbumID(
+    albumId: string,
+  ): Promise<string | undefined> {
+    const photo = await this.findOne({ where: { album_id: albumId } });
 
-    return photos;
+    return photo?.photo_name;
   }
 }
 
