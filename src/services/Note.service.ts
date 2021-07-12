@@ -1,4 +1,5 @@
 import { getRepository } from 'typeorm';
+import { validate as uuidValidate } from 'uuid';
 
 import AppError from '../errors/AppError';
 import ICreateNoteDTO from '../models/dtos/ICreateNoteDTO';
@@ -20,6 +21,20 @@ class NoteService {
 
     if (!(await noteRepository.save(note))) {
       throw new AppError('Error while create a new note.');
+    }
+
+    return note;
+  }
+
+  public async getNoteByID(note_id: string): Promise<Note> {
+    if (!uuidValidate(note_id)) {
+      throw new AppError('Note ID is not valid.', 400);
+    }
+    const noteRepository = getRepository(Note);
+    const note = await noteRepository.findOne({ where: { id: note_id } });
+
+    if (!note) {
+      throw new AppError('Note not found.', 400);
     }
 
     return note;

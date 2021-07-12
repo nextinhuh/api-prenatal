@@ -1,4 +1,4 @@
-import { getCustomRepository, getRepository } from 'typeorm';
+import { getCustomRepository } from 'typeorm';
 import path from 'path';
 import fs from 'fs';
 import { validate as uuidValidate } from 'uuid';

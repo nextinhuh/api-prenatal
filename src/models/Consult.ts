@@ -4,9 +4,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import Prescription from './Prescription';
 
 import User from './User';
 
@@ -32,6 +34,9 @@ export class Consult {
 
   @Column()
   user_id: string;
+
+  @OneToMany(() => Prescription, prescription => prescription.consult)
+  prescriptions: Prescription[];
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })

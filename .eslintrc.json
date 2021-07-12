@@ -21,6 +21,8 @@
   "rules": {
     "class-methods-use-this": "off",
     "no-plusplus": "off",
+    "no-param-reassign": "off",
+    "no-restricted-syntax": "off",
     "no-await-in-loop": "off",
     "camelcase": "off",
     "import/extensions": [

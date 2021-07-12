@@ -29,6 +29,14 @@ noteRouter.get('/', async (request, response) => {
   return response.json(notes);
 });
 
+// Get note by ID
+noteRouter.get('/:id', async (request, response) => {
+  const { id } = request.params;
+  const note = await noteService.getNoteByID(id);
+
+  return response.json(note);
+});
+
 // Edit note
 noteRouter.put('/:id', async (request, response) => {
   const { id } = request.params;
