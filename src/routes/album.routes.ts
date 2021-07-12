@@ -19,35 +19,20 @@ albumRouter.get('/', async (request, response) => {
   return response.json(albuns);
 });
 
-// Delete an album
-albumRouter.delete('/:id', async (request, response) => {
-  const { id } = request.params;
-  await albumService.deleteAlbum(id);
+// Get list of photos from album ID
+albumRouter.get('/photo/:id', async (request, response) => {
+  const album_id = request.params.id;
 
-  return response.status(200).json();
+  const photos = await albumService.getPhotosFromAlbum(album_id);
+
+  return response.json(classToClass(photos));
 });
 
-// Create a new album
-albumRouter.post('/', async (request, response) => {
-  const { name } = request.body;
+// Get album by ID
+albumRouter.get('/:id', async (request, response) => {
+  const album_id = request.params.id;
 
-  const album = await albumService.createNewAlbum({
-    user_id: request.user.id,
-    name,
-  });
-
-  return response.json(album);
-});
-
-// Edit album name
-albumRouter.put('/:id', async (request, response) => {
-  const { id } = request.params;
-  const { name } = request.body;
-
-  const album = await albumService.editAlbumName({
-    album_id: id,
-    name,
-  });
+  const album = await albumService.getAlbumByID(album_id);
 
   return response.json(album);
 });
@@ -69,21 +54,45 @@ albumRouter.post(
   },
 );
 
+// Create a new album
+albumRouter.post('/', async (request, response) => {
+  const { name } = request.body;
+
+  const album = await albumService.createNewAlbum({
+    user_id: request.user.id,
+    name,
+  });
+
+  return response.json(album);
+});
+
+// Delete an album
+albumRouter.delete('/:id', async (request, response) => {
+  const { id } = request.params;
+  await albumService.deleteAlbum(id);
+
+  return response.status(200).json();
+});
+
+// Edit album name
+albumRouter.put('/:id', async (request, response) => {
+  const { id } = request.params;
+  const { name } = request.body;
+
+  const album = await albumService.editAlbumName({
+    album_id: id,
+    name,
+  });
+
+  return response.json(album);
+});
+
 // Add photo from album with photo ID
 albumRouter.delete('/photo/:id', async (request, response) => {
   const { id } = request.params;
   await albumService.deletePhotoFromPhotoId(id);
 
   return response.status(200).json();
-});
-
-// Get list of photos from album ID
-albumRouter.get('/photo/:id', async (request, response) => {
-  const album_id = request.params.id;
-
-  const photos = await albumService.getPhotosFromAlbum(album_id);
-
-  return response.json(classToClass(photos));
 });
 
 export default albumRouter;

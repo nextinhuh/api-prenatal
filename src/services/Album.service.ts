@@ -1,8 +1,9 @@
 import { getCustomRepository, getRepository } from 'typeorm';
 import path from 'path';
 import fs from 'fs';
-import Album from '../models/Album';
+import { validate as uuidValidate } from 'uuid';
 
+import Album from '../models/Album';
 import AppError from '../errors/AppError';
 import AlbumRepository from '../repositories/AlbumRepository';
 import PhotoRepository from '../repositories/PhotoRepository';
@@ -31,6 +32,10 @@ class AlbumService {
   }
 
   public async deleteAlbum(album_id: string): Promise<void> {
+    if (!uuidValidate(album_id)) {
+      throw new AppError('Album ID is not valid.', 400);
+    }
+
     const albumRepository = getCustomRepository(AlbumRepository);
 
     const album = await albumRepository.findOne(album_id);
@@ -45,6 +50,9 @@ class AlbumService {
   }
 
   public async deletePhotoFromPhotoId(photo_id: string): Promise<void> {
+    if (!uuidValidate(photo_id)) {
+      throw new AppError('Photo ID is not valid.', 400);
+    }
     const photoRepository = getCustomRepository(PhotoRepository);
 
     const photo = await photoRepository.findOne(photo_id);
@@ -97,6 +105,10 @@ class AlbumService {
     album_id,
     photoFileName,
   }: ICreatePhotoDTO): Promise<Photo> {
+    if (!uuidValidate(album_id)) {
+      throw new AppError('Album ID is not valid.', 400);
+    }
+
     const photoRepository = getCustomRepository(PhotoRepository);
     const albumRepository = getCustomRepository(AlbumRepository);
 
@@ -117,6 +129,9 @@ class AlbumService {
   }
 
   public async getPhotosFromAlbum(albumId: string): Promise<Photo[]> {
+    if (!uuidValidate(albumId)) {
+      throw new AppError('Album ID is not valid.', 400);
+    }
     const photoRepository = getCustomRepository(PhotoRepository);
     const albumRepository = getCustomRepository(AlbumRepository);
 
@@ -135,6 +150,9 @@ class AlbumService {
     album_id,
     name,
   }: IEditAlbumDTO): Promise<Album> {
+    if (!uuidValidate(album_id)) {
+      throw new AppError('Album ID is not valid.', 400);
+    }
     const albumRepository = getCustomRepository(AlbumRepository);
 
     const album = await albumRepository.findOne(album_id);
@@ -146,6 +164,23 @@ class AlbumService {
     album.name = name;
 
     await albumRepository.save(album);
+
+    return album;
+  }
+
+  public async getAlbumByID(album_id: string): Promise<Album> {
+    if (!uuidValidate(album_id)) {
+      throw new AppError('Album ID is not valid.', 400);
+    }
+    const albumRepository = getCustomRepository(AlbumRepository);
+
+    const album = await albumRepository.findOne({
+      where: { id: album_id },
+    });
+
+    if (!album) {
+      throw new AppError('Album not found.', 400);
+    }
 
     return album;
   }
