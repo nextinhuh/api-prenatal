@@ -16,7 +16,7 @@ albumRouter.use(ensureAuthenticated);
 // Get list of albuns
 albumRouter.get('/', async (request, response) => {
   const albuns = await albumService.getAllAlbunsFromUserId(request.user.id);
-  return response.json(albuns);
+  return response.json(classToClass(albuns));
 });
 
 // Get list of photos from album ID

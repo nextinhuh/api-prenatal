@@ -75,28 +75,13 @@ class AlbumService {
     }
   }
 
-  public async getAllAlbunsFromUserId(
-    user_id: string,
-  ): Promise<Album[] | undefined> {
+  public async getAllAlbunsFromUserId(user_id: string): Promise<Album[]> {
     const albumRepository = getCustomRepository(AlbumRepository);
-    const photoRepository = getCustomRepository(PhotoRepository);
 
-    const albuns = await albumRepository.find({ where: { user_id } });
-
-    for (let i = 0; i < albuns.length; i++) {
-      const photoName = await photoRepository.findFirstPhotoNameFromAlbumID(
-        albuns[i].id,
-      );
-      if (photoName) {
-        Object.assign(albuns[i], {
-          cover_photo_url: photoName,
-        });
-      } else {
-        Object.assign(albuns[i], {
-          cover_photo_url: null,
-        });
-      }
-    }
+    const albuns = await albumRepository.find({
+      relations: ['photos'],
+      where: { user_id },
+    });
 
     return albuns;
   }

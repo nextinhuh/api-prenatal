@@ -1,10 +1,7 @@
-import { createQueryBuilder, getRepository } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { validate as uuidValidate } from 'uuid';
 
 import AppError from '../errors/AppError';
-import ICreateNoteDTO from '../models/dtos/ICreateNoteDTO';
-import Note from '../models/Note';
-import IEditNoteDTO from '../models/dtos/IEditNoteDTO';
 import ICreateConsultDTO from '../models/dtos/ICreateConsultDTO';
 import Consult from '../models/Consult';
 import Prescription from '../models/Prescription';

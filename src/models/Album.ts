@@ -4,9 +4,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import Photo from './Photo';
 import User from './User';
 
 @Entity('albuns')
@@ -19,6 +21,9 @@ class Album {
 
   @Column()
   user_id: string;
+
+  @OneToMany(() => Photo, photo => photo.album)
+  photos: Photo[];
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
