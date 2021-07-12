@@ -15,6 +15,9 @@ class ConsultService {
     medicalRecords,
     prescriptions,
   }: ICreateConsultDTO): Promise<IGETConsultDTO> {
+    if (!uuidValidate(patient_id) || !uuidValidate(user_id)) {
+      throw new AppError('ID is not valid.', 400);
+    }
     const consultRepository = getRepository(Consult);
     const userRepository = getRepository(User);
     const prescriptionRepository = getRepository(Prescription);
@@ -35,7 +38,8 @@ class ConsultService {
       heart_rate: medicalRecords.heart_rate,
       heigh: medicalRecords.heigh,
       weight: medicalRecords.weight,
-      user_id: patient_id,
+      user_id,
+      patient_id,
     });
 
     for (const prescription of prescriptions) {
@@ -53,7 +57,8 @@ class ConsultService {
         heart_rate: medicalRecords.heart_rate,
         heigh: medicalRecords.heigh,
         weight: medicalRecords.weight,
-        user_id: patient_id,
+        user_id,
+        patient_id,
       },
       prescriptions,
     };
@@ -62,65 +67,51 @@ class ConsultService {
   }
 
   public async getAllConsultsFromUserId(user_id: string): Promise<Consult[]> {
+    if (!uuidValidate(user_id)) {
+      throw new AppError('User ID is not valid.', 400);
+    }
     const consutlRepository = getRepository(Consult);
 
     const consults = await consutlRepository.find({
       relations: ['prescriptions'],
-      where: { user_id },
+      where: { patient_id: user_id },
     });
 
     return consults;
   }
-  /*
-  public async getNoteByID(note_id: string): Promise<Note> {
-    if (!uuidValidate(note_id)) {
-      throw new AppError('Note ID is not valid.', 400);
-    }
-    const noteRepository = getRepository(Note);
-    const note = await noteRepository.findOne({ where: { id: note_id } });
 
-    if (!note) {
-      throw new AppError('Note not found.', 400);
+  public async getAllConsultsCreatedByUserId(user_id: string): Promise<User[]> {
+    if (!uuidValidate(user_id)) {
+      throw new AppError('User ID is not valid.', 400);
     }
+    const userRepository = getRepository(User);
 
-    return note;
+    const userConsultCreatedList = await userRepository.find({
+      relations: ['consults'],
+      where: { id: user_id },
+    });
+
+    return userConsultCreatedList;
   }
 
-  public async editNote({
-    description,
-    title,
-    note_id,
-  }: IEditNoteDTO): Promise<Note> {
-    const noteRepository = getRepository(Note);
-
-    const note = await noteRepository.findOne(note_id);
-
-    if (!note) {
-      throw new AppError('Note not found.', 400);
+  public async getConsultByID(
+    consult_id: string,
+  ): Promise<Consult | undefined> {
+    if (!uuidValidate(consult_id)) {
+      throw new AppError('Consult ID is not valid.', 400);
     }
+    const consutlRepository = getRepository(Consult);
 
-    note.title = title;
-    note.description = description;
+    const consult = await consutlRepository
+      .findOne({
+        where: { id: consult_id },
+      })
+      .catch(() => {
+        throw new AppError('Consult not found.', 400);
+      });
 
-    await noteRepository.save(note);
-
-    return note;
+    return consult;
   }
-
-  public async deleteNote(note_id: string): Promise<void> {
-    const noteRepository = getRepository(Note);
-
-    const note = await noteRepository.findOne(note_id);
-
-    if (!note) {
-      throw new AppError('Note not found.', 400);
-    }
-
-    if (!(await noteRepository.delete(note_id))) {
-      throw new AppError('Error while delete note.');
-    }
-  }
-  */
 }
 
 export default ConsultService;

@@ -43,6 +43,10 @@ export default class CreateConsults1625196135531 implements MigrationInterface {
             type: 'uuid',
           },
           {
+            name: 'patient_id',
+            type: 'uuid',
+          },
+          {
             name: 'created_at',
             type: 'timestamp',
             default: 'now()',

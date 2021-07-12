@@ -1,11 +1,14 @@
 /* eslint-disable camelcase */
+import { Exclude } from 'class-transformer';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import Consult from './Consult';
 
 @Entity('users')
 class User {
@@ -19,6 +22,7 @@ class User {
   email: string;
 
   @Column()
+  @Exclude()
   password?: string;
 
   @Column()
@@ -32,6 +36,9 @@ class User {
 
   @Column({ nullable: true })
   avatar: string;
+
+  @OneToMany(() => Consult, consult => consult.user)
+  consults: Consult[];
 
   @CreateDateColumn()
   created_at: Date;

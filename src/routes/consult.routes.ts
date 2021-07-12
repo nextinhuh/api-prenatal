@@ -1,3 +1,4 @@
+import { classToClass } from 'class-transformer';
 import { Router } from 'express';
 
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
@@ -30,6 +31,23 @@ consultRouter.get('/', async (request, response) => {
   );
 
   return response.json(consults);
+});
+
+// Get list of consults created by user ID
+consultRouter.get('/created', async (request, response) => {
+  const userConsultCreatedList = await consultService.getAllConsultsCreatedByUserId(
+    request.user.id,
+  );
+
+  return response.json(classToClass(userConsultCreatedList));
+});
+
+// Get consults by ID
+consultRouter.get('/:id', async (request, response) => {
+  const { id } = request.params;
+  const consult = await consultService.getConsultByID(id);
+
+  return response.json(consult);
 });
 
 /*

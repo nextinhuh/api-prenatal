@@ -35,10 +35,13 @@ export class Consult {
   @Column()
   user_id: string;
 
+  @Column()
+  patient_id: string;
+
   @OneToMany(() => Prescription, prescription => prescription.consult)
   prescriptions: Prescription[];
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, user => user.consults)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
