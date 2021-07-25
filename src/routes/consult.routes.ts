@@ -50,35 +50,4 @@ consultRouter.get('/:id', async (request, response) => {
   return response.json(consult);
 });
 
-/*
-// Get note by ID
-consultRouter.get('/:id', async (request, response) => {
-  const { id } = request.params;
-  const note = await consultService.getNoteByID(id);
-
-  return response.json(note);
-});
-
-// Edit note
-consultRouter.put('/:id', async (request, response) => {
-  const { id } = request.params;
-  const { description, title } = request.body;
-
-  const note = await consultService.editNote({
-    description,
-    note_id: id,
-    title,
-  });
-
-  return response.json(note);
-});
-
-// Delete an note
-consultRouter.delete('/:id', async (request, response) => {
-  const { id } = request.params;
-  await consultService.deleteNote(id);
-
-  return response.status(200).json();
-});
-*/
 export default consultRouter;

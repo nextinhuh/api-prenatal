@@ -2,20 +2,19 @@ import { Router } from 'express';
 import multer from 'multer';
 import uploadConfig from '../config/upload';
 
-import CreateUserService from '../services/CreateUsersService';
+import UserService from '../services/User.service';
 import UpdateUserAvatarService from '../services/UpdateUserAvatarService';
 
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 
 const usersRouter = Router();
+const userService = new UserService();
 const upload = multer(uploadConfig);
 
 usersRouter.post('/', async (request, response) => {
   const { name, email, password } = request.body;
 
-  const createUser = new CreateUserService();
-
-  const user = await createUser.execute({
+  const user = await userService.createNewUser({
     name,
     email,
     password,
@@ -42,6 +41,6 @@ usersRouter.patch(
 
     return response.json(user);
   },
-); // patch é parecido com  "PUT", a diferença é que é usado para alterações pequenas, de apenas 1 campo
+);
 
 export default usersRouter;
