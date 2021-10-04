@@ -87,7 +87,7 @@ albumRouter.put('/:id', async (request, response) => {
   return response.json(album);
 });
 
-// Add photo from album with photo ID
+// Delete photo from album with photo ID
 albumRouter.delete('/photo/:id', async (request, response) => {
   const { id } = request.params;
   await albumService.deletePhotoFromPhotoId(id);

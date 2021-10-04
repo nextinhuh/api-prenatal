@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
+import { classToClass } from 'class-transformer';
 import uploadConfig from '../config/upload';
 
 import UserService from '../services/User.service';
@@ -25,6 +26,55 @@ usersRouter.post('/', async (request, response) => {
   return response.json(user);
 });
 
+usersRouter.put(
+  '/update-profile',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { name, email, password } = request.body;
+
+    const user = await userService.updateUserProfile({
+      name,
+      email,
+      password,
+      user_id: request.user.id,
+    });
+
+    return response.json(classToClass(user));
+  },
+);
+
+usersRouter.put(
+  '/user-preferences',
+  ensureAuthenticated,
+  async (request, response) => {
+    const { genderPreference, menstruationDate } = request.body;
+
+    const user = await userService.updateUserGenderPreferenceAndMenstruation({
+      genderPreference,
+      menstruationDate,
+      user_id: request.user.id,
+    });
+
+    return response.json(classToClass(user));
+  },
+);
+
+usersRouter.get('/profile', ensureAuthenticated, async (request, response) => {
+  const user = await userService.getUserByID(request.user.id);
+
+  return response.json(classToClass(user));
+});
+
+usersRouter.get(
+  '/user-list',
+  ensureAuthenticated,
+  async (request, response) => {
+    const user = await userService.getUserList(request.user.id);
+
+    return response.json(classToClass(user));
+  },
+);
+
 usersRouter.patch(
   '/avatar',
   ensureAuthenticated,
@@ -39,7 +89,7 @@ usersRouter.patch(
 
     delete user.password;
 
-    return response.json(user);
+    return response.json(classToClass(user));
   },
 );
 

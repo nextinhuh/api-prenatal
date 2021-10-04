@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import {
   Entity,
   Column,
@@ -45,6 +45,15 @@ class User {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Expose({ name: 'avatar' })
+  getPhoto_url(): string | null {
+    if (!this.avatar) {
+      return null;
+    }
+
+    return `http://localhost:3333/files/${this.avatar}`;
+  }
 }
 
 export default User;

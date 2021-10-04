@@ -1,3 +1,4 @@
+import { classToClass } from 'class-transformer';
 import { Router } from 'express';
 
 import UserService from '../services/User.service';
@@ -15,7 +16,10 @@ sessionsRouter.post('/', async (request, response) => {
 
   delete user.password;
 
-  return response.json({ user, token });
+  return response.json({
+    user: classToClass(user),
+    token,
+  });
 });
 
 export default sessionsRouter;
