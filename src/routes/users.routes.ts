@@ -7,6 +7,7 @@ import UserService from '../services/User.service';
 import UpdateUserAvatarService from '../services/UpdateUserAvatarService';
 
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
+import SendRecoverPasswordEmailService from '../services/SendRecoverPasswordEmailService';
 
 const usersRouter = Router();
 const userService = new UserService();
@@ -74,6 +75,24 @@ usersRouter.get(
     return response.json(classToClass(user));
   },
 );
+
+usersRouter.post('/forgot', async (request, response) => {
+  const sendEmailRecover = new SendRecoverPasswordEmailService();
+
+  await sendEmailRecover.sendMail({
+    subject: '',
+    to: {
+      email: '',
+      name: '',
+    },
+    from: {
+      email: '',
+      name: '',
+    },
+  });
+
+  return response.json('Enviou');
+});
 
 usersRouter.patch(
   '/avatar',

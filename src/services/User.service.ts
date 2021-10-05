@@ -1,8 +1,9 @@
 import { getRepository } from 'typeorm';
 import { compare, hash } from 'bcrypt';
 import { validate as uuidValidate } from 'uuid';
-
 import { sign } from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+
 import AppError from '../errors/AppError';
 import Note from '../models/Note';
 import IEditNoteDTO from '../models/dtos/IEditNoteDTO';
@@ -182,48 +183,6 @@ class UserService {
     }
 
     return user;
-  }
-
-  public async getAllNotesFromUserId(user_id: string): Promise<Note[]> {
-    const noteRepository = getRepository(Note);
-    const note = noteRepository.find({ where: { user_id } });
-
-    return note;
-  }
-
-  public async editNote({
-    description,
-    title,
-    note_id,
-  }: IEditNoteDTO): Promise<Note> {
-    const noteRepository = getRepository(Note);
-
-    const note = await noteRepository.findOne(note_id);
-
-    if (!note) {
-      throw new AppError('Note not found.', 400);
-    }
-
-    note.title = title;
-    note.description = description;
-
-    await noteRepository.save(note);
-
-    return note;
-  }
-
-  public async deleteNote(note_id: string): Promise<void> {
-    const noteRepository = getRepository(Note);
-
-    const note = await noteRepository.findOne(note_id);
-
-    if (!note) {
-      throw new AppError('Note not found.', 400);
-    }
-
-    if (!(await noteRepository.delete(note_id))) {
-      throw new AppError('Error while delete note.');
-    }
   }
 }
 
