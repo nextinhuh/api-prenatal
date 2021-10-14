@@ -7,7 +7,7 @@ import UserService from '../services/User.service';
 import UpdateUserAvatarService from '../services/UpdateUserAvatarService';
 
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
-import SendRecoverPasswordEmailService from '../services/SendRecoverPasswordEmailService';
+import ISendMailDTO from '../models/dtos/ISendMailDTO';
 
 const usersRouter = Router();
 const userService = new UserService();
@@ -77,21 +77,12 @@ usersRouter.get(
 );
 
 usersRouter.post('/forgot', async (request, response) => {
-  const sendEmailRecover = new SendRecoverPasswordEmailService();
+  const { email } = request.body;
+  const sendEmailRecover = await userService.sendRecoverPasswordEmailService(
+    email,
+  );
 
-  await sendEmailRecover.sendMail({
-    subject: '',
-    to: {
-      email: '',
-      name: '',
-    },
-    from: {
-      email: '',
-      name: '',
-    },
-  });
-
-  return response.json('Enviou');
+  return response.json({ message: sendEmailRecover });
 });
 
 usersRouter.patch(

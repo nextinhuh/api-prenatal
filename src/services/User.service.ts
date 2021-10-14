@@ -3,6 +3,7 @@ import { compare, hash } from 'bcrypt';
 import { validate as uuidValidate } from 'uuid';
 import { sign } from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import path from 'path';
 
 import AppError from '../errors/AppError';
 import Note from '../models/Note';
@@ -11,9 +12,11 @@ import ICreateUserDTO from '../models/dtos/ICreateUserDTO';
 import IAuthenticateUserDTO from '../models/dtos/IAuthenticateUserDTO';
 import IGETUserAuthenticateDTO from '../models/dtos/IGETUserAuthenticateDTO';
 import User from '../models/User';
+import ISendMailDTO from '../models/dtos/ISendMailDTO';
 import authConfig from '../config/auth';
 import IUpdateUserPreferenceDTO from '../models/dtos/IUpdateUserPreferenceDTO';
 import IUpdateUserProfileDTO from '../models/dtos/IUpdateUserProfileDTO';
+import ConvertHtlm from '../utils/ConvertHtlm';
 
 class UserService {
   public async createNewUser({
@@ -184,6 +187,58 @@ class UserService {
 
     return user;
   }
-}
 
+  public async sendRecoverPasswordEmailService(email: string): Promise<string> {
+    const userRepository = getRepository(User);
+    const user = await userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new AppError('User not found.', 400);
+    }
+
+    const port = 587;
+    const senderAddress = process.env.SENDER_ADDRESS;
+    const toAddresses = user.email;
+    const subject = 'Cegonha APP [Recuperação de Senha]';
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_ENDPOINT,
+      port,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USERNAME,
+        pass: process.env.SMTP_PASSWORD,
+      },
+    });
+
+    const forgotPasswordTemplate = path.resolve(
+      __dirname,
+      'views',
+      'forgot_password.hbs',
+    );
+
+    const templateData = {
+      file: forgotPasswordTemplate,
+      variables: {
+        name: user.name,
+        link: `${process.env.APP_WEB_URL}/reset-password?token=${'123'}`,
+      },
+    };
+
+    const convertHtlm = new ConvertHtlm(templateData);
+
+    const message = await transporter.sendMail({
+      from: senderAddress,
+      to: toAddresses,
+      subject,
+      html: await convertHtlm.html(),
+    });
+
+    console.log('Message sent: %s', message.messageId);
+    if (message.messageId) {
+      return 'Email successfully sent.';
+    }
+    return 'Error sending the email.';
+  }
+}
 export default UserService;
