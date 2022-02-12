@@ -95,4 +95,12 @@ albumRouter.delete('/photo/:id', async (request, response) => {
   return response.status(200).json();
 });
 
+// Test
+albumRouter.get('/test/black-and-white', async (request, response) => {
+  // const { id } = request.params;
+  await albumService.colorfulImageColorization();
+
+  return response.status(200).json();
+});
+
 export default albumRouter;

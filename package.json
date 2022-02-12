@@ -9,6 +9,7 @@
     "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
+    "algorithmia": "^0.3.10",
     "bcrypt": "^5.0.0",
     "class-transformer": "^0.4.0",
     "cors": "^2.8.5",

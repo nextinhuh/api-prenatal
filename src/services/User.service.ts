@@ -4,6 +4,7 @@ import { validate as uuidValidate } from 'uuid';
 import { sign } from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import path from 'path';
+import { isAfter, addHours } from 'date-fns';
 
 import AppError from '../errors/AppError';
 import Note from '../models/Note';
@@ -17,6 +18,7 @@ import authConfig from '../config/auth';
 import IUpdateUserPreferenceDTO from '../models/dtos/IUpdateUserPreferenceDTO';
 import IUpdateUserProfileDTO from '../models/dtos/IUpdateUserProfileDTO';
 import ConvertHtlm from '../utils/ConvertHtlm';
+import UserToken from '../models/UserToken';
 
 class UserService {
   public async createNewUser({
@@ -190,6 +192,7 @@ class UserService {
 
   public async sendRecoverPasswordEmailService(email: string): Promise<string> {
     const userRepository = getRepository(User);
+    const userTokenRepository = getRepository(UserToken);
     const user = await userRepository.findOne({ where: { email } });
 
     if (!user) {
@@ -213,15 +216,22 @@ class UserService {
 
     const forgotPasswordTemplate = path.resolve(
       __dirname,
+      '..',
       'views',
       'forgot_password.hbs',
     );
+
+    const userToken = userTokenRepository.create({
+      user_id: user.id,
+    });
+
+    await userTokenRepository.save(userToken);
 
     const templateData = {
       file: forgotPasswordTemplate,
       variables: {
         name: user.name,
-        link: `${process.env.APP_WEB_URL}/reset-password?token=${'123'}`,
+        link: `${process.env.APP_WEB_URL}/reset-password?token=${userToken.token}`,
       },
     };
 
@@ -234,11 +244,50 @@ class UserService {
       html: await convertHtlm.html(),
     });
 
-    console.log('Message sent: %s', message.messageId);
+    // console.log('Message sent: %s', message.messageId);
     if (message.messageId) {
       return 'Email successfully sent.';
     }
-    return 'Error sending the email.';
+    return 'Error while send the email.';
+  }
+
+  public async resetUserPassword(
+    password: string,
+    token: string,
+  ): Promise<void> {
+    const userRepository = getRepository(User);
+    const userTokenRepository = getRepository(UserToken);
+
+    const userToken = await userTokenRepository.findOne({
+      where: {
+        token,
+      },
+    });
+
+    if (!userToken) {
+      throw new AppError('Token not found.', 400);
+    }
+
+    const user = await userRepository.findOne({
+      where: {
+        id: userToken.user_id,
+      },
+    });
+
+    if (!user) {
+      throw new AppError('User not found.', 400);
+    }
+
+    const tokenCreatedAt = userToken.created_at;
+    const compareDate = addHours(tokenCreatedAt, 2);
+
+    if (isAfter(Date.now(), compareDate)) {
+      throw new AppError('User dows not exists');
+    }
+
+    user.password = await hash(password, 8);
+
+    await userRepository.save(user);
   }
 }
 export default UserService;

@@ -2,6 +2,7 @@ import { getCustomRepository } from 'typeorm';
 import path from 'path';
 import fs from 'fs';
 import { validate as uuidValidate } from 'uuid';
+import Algorithmia from 'algorithmia';
 
 import Album from '../models/Album';
 import AppError from '../errors/AppError';
@@ -168,6 +169,35 @@ class AlbumService {
     }
 
     return album;
+  }
+
+  public async colorfulImageColorization(): Promise<void> {
+    let download_uri: any;
+    const input = {
+      image:
+        'http://4.bp.blogspot.com/_UaCoT-COyRc/S3KwzLgzfYI/AAAAAAAABbs/7go9uHcorJY/s320/Ensei+Neto.jpg',
+      phone: 'sony',
+    };
+    const client = Algorithmia.client('simBN/R3Zd9VyQfc3MCmyjm7Mop1');
+    await client
+      .algo('deeplearning/PhotoQualityEnhancement/0.1.3') // timeout is optional
+      .pipe(input)
+      .then(function (response: any) {
+        download_uri = response?.get()?.output;
+        client.file(download_uri).exists(function (exists: any) {
+          if (exists) {
+            client.file(download_uri).get(function (err: any, data: any) {
+              if (err) {
+                console.log('Failed to download file.');
+                console.log(err);
+              } else {
+                fs.writeFileSync('tmp/xingling.png', data);
+                console.log('Successfully downloaded data.');
+              }
+            });
+          }
+        });
+      });
   }
 }
 

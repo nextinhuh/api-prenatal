@@ -85,6 +85,14 @@ usersRouter.post('/forgot', async (request, response) => {
   return response.json({ message: sendEmailRecover });
 });
 
+usersRouter.post('/reset-password', async (request, response) => {
+  const { password, token } = request.body;
+
+  await userService.resetUserPassword(password, token);
+
+  return response.status(204).json();
+});
+
 usersRouter.patch(
   '/avatar',
   ensureAuthenticated,
